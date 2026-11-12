@@ -1,7 +1,9 @@
 name = "edgetunnel-poly-gemini"
 main = "_worker.js"
-compatibility_date = "2024-11-01"
+compatibility_date = "2025-11-04"
+workers_dev = true
+keep_vars = true
 
 [vars]
 UUID = "7c9e6679-7425-40de-944b-e07fc1f90ae7"
-PROXYIP = "sg.cf.cmliussss.net,jp.cf.cmliussss.net,proxyip.fxxk.dedyn.io"
+PROXYIP = "ProxyIP.JP.CMLiussss.net"

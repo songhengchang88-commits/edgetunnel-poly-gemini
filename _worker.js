@@ -1,4 +1,4 @@
-﻿const Version = '2026-10-08 22:23:27';
+﻿const Version = '2026-11-10 23:26:46';
 let config_JSON, 缓存SOCKS5白名单 = null, 调试日志打印 = false;
 let SOCKS5白名单 = ['*tapecontent.net', '*cloudatacdn.com', '*loadshare.org', '*cdn-centaurus.com', 'scholar.google.com'];
 const Pages静态页面 = 'https://edt-pages.github.io', EDT_版本号 = Number(String(Version).replace(/\D+/g, ''));
@@ -31,7 +31,7 @@ export default {
 		const 加密秘钥 = env.KEY || '勿动此默认密钥，有需求请自行通过添加变量KEY进行修改';
 		const userIDMD5 = await MD5MD5(管理员密码 + 加密秘钥);
 		const uuidRegex = /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-4[0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$/;
-		const envUUID = env.UUID || env.uuid || "7c9e6679-7425-40de-944b-e07fc1f90ae7";
+		const envUUID = env.UUID || env.uuid;
 		const userID = (envUUID && uuidRegex.test(envUUID)) ? envUUID.toLowerCase() : [userIDMD5.slice(0, 8), userIDMD5.slice(8, 12), '4' + userIDMD5.slice(13, 16), '8' + userIDMD5.slice(17, 20), userIDMD5.slice(20)].join('-');
 		const hosts = env.HOST ? (await 整理成数组(env.HOST)).map(h => h.toLowerCase().replace(/^https?:\/\//, '').split('/')[0].split(':')[0]) : [url.hostname];
 		const host = hosts[0];
@@ -41,9 +41,7 @@ export default {
 		反代并发拨号数 = Math.max(1, Number(env.PROXY_CONCURRENT_DIAL) || 反代并发拨号数);
 		TCP并发拨号数 = Math.max(1, Number(env.TCP_CONCURRENT_DIAL) || TCP并发拨号数);
 		if (!env.TCP_CONCURRENT_DIAL && TCP并发拨号数 !== 1 && 识别运营商(request) === 'cmcc') TCP并发拨号数 = 1;
-		// 针对 Polymarket (剔除地区限制) + Google Gemini 专门锁定的优质新加坡/日本落地反代池
-		const 专属解锁反代池 = ['ProxyIP.JP.CMLiussss.net', 'proxyip.jp.fxxk.dedyn.io', '138.2.31.37'];
-		let 默认反代IP = 专属解锁反代池[Math.floor(Math.random() * 专属解锁反代池.length)], 默认反代兜底 = false;
+		let 默认反代IP = (`${request.cf.colo}.${特征码字典[0]}.${特征码字典[1]}SsSs.nEt`).toLowerCase(), 默认反代兜底 = true;
 		if (env.PROXYIP) {
 			const proxyIPs = await 整理成数组(env.PROXYIP);
 			默认反代IP = proxyIPs[Math.floor(Math.random() * proxyIPs.length)];
@@ -4803,6 +4801,7 @@ function 获取传输协议配置(配置 = {}) {
 		"xPaddingHeader": 本机标识头,
 		"xPaddingKey": 本机标识键
 	};
+	if (配置.连接复用.启用 === true) 叉混淆JSON.xmux = 配置.连接复用.xmux;
 	return {
 		type: 是gRPC ? (配置.gRPC模式 === 'multi' ? 'grpc&mode=multi' : 'grpc&mode=gun') : (配置.传输协议 === 'xhttp' ? `xhttp&mode=stream-one&extra=${encodeURIComponent(JSON.stringify(叉混淆JSON))}` : 'ws'),
 		路径字段名: 是gRPC ? 'serviceName' : 'path',
@@ -5599,6 +5598,14 @@ async function DoH查询(域名, 记录类型, DoH解析服务 = "https://cloudf
 
 async function 读取config_JSON(env, hostname, userID, UA = "Mozilla/5.0", 重置配置 = false) {
 	const _p = 特征码字典[0];
+	const xmux默认值 = {
+		maxConnections: 4,
+		maxConcurrency: 0,
+		cMaxReuseTimes: 0,
+		hMaxRequestTimes: 0,
+		hMaxReusableSecs: 3600,
+		hKeepAlivePeriod: 0
+	}
 	const host = hostname, Ali_DoH = "https://dns.alidns.com/dns-query", ECH_SNI = "cloudflare-ech.com", 占位符 = '{{IP:PORT}}', 初始化开始时间 = performance.now(), 默认配置JSON = {
 		TIME: new Date().toISOString(),
 		HOST: host,
@@ -5618,6 +5625,10 @@ async function 读取config_JSON(env, hostname, userID, UA = "Mozilla/5.0", 重�
 		ECHConfig: {
 			DNS: Ali_DoH,
 			SNI: ECH_SNI,
+		},
+		连接复用: {
+			启用: false,
+			xmux: xmux默认值
 		},
 		SS: {
 			加密方式: "aes-128-gcm",
@@ -5714,6 +5725,7 @@ async function 读取config_JSON(env, hostname, userID, UA = "Mozilla/5.0", 重�
 		config_JSON = 默认配置JSON;
 	}
 
+	if (!config_JSON.连接复用) config_JSON.连接复用 = { 启用: false, xmux: xmux默认值 };
 	if (!config_JSON.订阅转换配置.SUBLIST) config_JSON.订阅转换配置.SUBLIST = false;
 	if (!config_JSON.订阅转换配置.UDP) config_JSON.订阅转换配置.UDP = false;
 	if (!config_JSON.订阅转换配置.XUDP) config_JSON.订阅转换配置.XUDP = false;

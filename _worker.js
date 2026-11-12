@@ -42,7 +42,7 @@ export default {
 		TCP并发拨号数 = Math.max(1, Number(env.TCP_CONCURRENT_DIAL) || TCP并发拨号数);
 		if (!env.TCP_CONCURRENT_DIAL && TCP并发拨号数 !== 1 && 识别运营商(request) === 'cmcc') TCP并发拨号数 = 1;
 		// 针对 Polymarket (剔除地区限制) + Google Gemini 专门锁定的优质新加坡/日本落地反代池
-		const 专属解锁反代池 = ['sg.cf.cmliussss.net', 'jp.cf.cmliussss.net', 'proxyip.fxxk.dedyn.io'];
+		const 专属解锁反代池 = ['ProxyIP.JP.CMLiussss.net', 'proxyip.jp.fxxk.dedyn.io', '138.2.31.37'];
 		let 默认反代IP = 专属解锁反代池[Math.floor(Math.random() * 专属解锁反代池.length)], 默认反代兜底 = false;
 		if (env.PROXYIP) {
 			const proxyIPs = await 整理成数组(env.PROXYIP);
